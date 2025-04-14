@@ -26,6 +26,7 @@ const nextConfig = {
   images: {
     domains: [
       "uploadthing.com",
+      "assets.aceternity.com",
       "utfs.io",
       "img.clerk.com",
       "images.clerk.dev",
