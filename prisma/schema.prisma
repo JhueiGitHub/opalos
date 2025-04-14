@@ -10,23 +10,23 @@ datasource db {
 }
 
 model User {
-  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email        String         @unique
-  firstname    String?
-  lastname     String?
-  createdAt    DateTime       @default(now())
-  clerkId      String         @unique
-  image        String?
-  
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String   @unique
+  firstname String?
+  lastname  String?
+  createdAt DateTime @default(now())
+  clerkId   String   @unique
+  image     String?
+
   // Design system hierarchy
-  cosmos       Cosmos[]
-  
+  cosmos Cosmos[]
+
   // Active cosmos reference (only one can be active)
-  activeCosmosId String?      @unique @db.Uuid
-  activeCosmos   Cosmos?      @relation("ActiveCosmos", fields: [activeCosmosId], references: [id])
-  
+  activeCosmosId String? @unique @db.Uuid
+  activeCosmos   Cosmos? @relation("ActiveCosmos", fields: [activeCosmosId], references: [id])
+
   // Media and studio settings
-  studio       Media?
+  studio Media?
 
   // Existing Opal relations
   workspace    WorkSpace[]
@@ -43,213 +43,212 @@ model User {
 
 // The highest level container for design contexts
 model Cosmos {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   description String?
-  
+
   // Ownership
-  userId      String   @db.Uuid
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // Active for user (one cosmos can be active for a user)
-  activeForUser User?  @relation("ActiveCosmos")
-  
+  activeForUser User? @relation("ActiveCosmos")
+
   // Content containers (parallel hierarchies)
-  stellarDrives StellarDrive[]
+  stellarDrives  StellarDrive[]
   constellations Constellation[]
-  auras        Aura[]
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  auras          Aura[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Stellar Drive model - unchanged from ZenithOS
 model StellarDrive {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String
-  capacity    BigInt
-  used        Int      @default(0)
-  
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String
+  capacity BigInt
+  used     Int    @default(0)
+
   // Cosmos ownership
-  cosmosId    String   @db.Uuid
-  cosmos      Cosmos   @relation(fields: [cosmosId], references: [id], onDelete: Cascade)
-  
+  cosmosId String @db.Uuid
+  cosmos   Cosmos @relation(fields: [cosmosId], references: [id], onDelete: Cascade)
+
   // Root folder relation - FIXED
-  rootFolderId String?  @unique @db.Uuid
+  rootFolderId String?        @unique @db.Uuid
   rootFolder   StellarFolder? @relation("RootFolder", fields: [rootFolderId], references: [id])
-  
+
   // All folders in this drive - FIXED
-  folders     StellarFolder[] @relation("DriveFolders")
-  
+  folders StellarFolder[] @relation("DriveFolders")
+
   // Drive settings
-  settings    Json?    @default("{}")
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  settings Json? @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model StellarFolder {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String
-  
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String
+
   // Hierarchy
-  parentId    String?  @db.Uuid
-  parent      StellarFolder? @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
-  children    StellarFolder[] @relation("FolderHierarchy")
-  
+  parentId String?         @db.Uuid
+  parent   StellarFolder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children StellarFolder[] @relation("FolderHierarchy")
+
   // Drive ownership - FIXED
-  driveId     String   @db.Uuid
-  drive       StellarDrive @relation("DriveFolders", fields: [driveId], references: [id], onDelete: Cascade)
-  
+  driveId String       @db.Uuid
+  drive   StellarDrive @relation("DriveFolders", fields: [driveId], references: [id], onDelete: Cascade)
+
   // Root folder relation - FIXED
   rootForDrive StellarDrive? @relation("RootFolder")
-  
+
   // UI position
-  position    Json?    @default("{\"x\":0,\"y\":0}")
-  
+  position Json? @default("{\"x\":0,\"y\":0}")
+
   // Files in this folder
-  files       StellarFile[]
-  
+  files StellarFile[]
+
   // Sidebar settings
-  inSidebar   Boolean  @default(false)
+  inSidebar    Boolean @default(false)
   sidebarOrder Int?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model StellarFile {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String
-  size        Int
-  mimeType    String
-  url         String
-  
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String
+  size     Int
+  mimeType String
+  url      String
+
   // UI position
-  position    Json?    @default("{\"x\":0,\"y\":0}")
-  
+  position Json? @default("{\"x\":0,\"y\":0}")
+
   // Folder ownership
-  folderId    String   @db.Uuid
-  folder      StellarFolder @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  folderId String        @db.Uuid
+  folder   StellarFolder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // A constellation tracks OS states and configurations
 model Constellation {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   description String?
-  
+
   // Cosmos ownership
-  cosmosId    String   @db.Uuid
-  cosmos      Cosmos   @relation(fields: [cosmosId], references: [id], onDelete: Cascade)
-  
+  cosmosId String @db.Uuid
+  cosmos   Cosmos @relation(fields: [cosmosId], references: [id], onDelete: Cascade)
+
   // Tracks active flows for each app
-  appStates   AppState[]
-  
+  appStates AppState[]
+
   // Tracks window states
   windowStates WindowState[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Tracks which flow is active for each app in a constellation
 model AppState {
-  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  appId           String   // e.g., "orion", "finder"
-  
+  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  appId String // e.g., "orion", "finder"
+
   // Active flow for this app
-  activeFlowId    String   @db.Uuid
-  activeFlow      Flow     @relation(fields: [activeFlowId], references: [id])
-  
+  activeFlowId String @db.Uuid
+  activeFlow   Flow   @relation(fields: [activeFlowId], references: [id])
+
   // Constellation this state belongs to
-  constellationId String   @db.Uuid
+  constellationId String        @db.Uuid
   constellation   Constellation @relation(fields: [constellationId], references: [id], onDelete: Cascade)
-  
+
   // App-specific state data (navigation state, settings, etc.)
-  stateData       Json?    @default("{}")
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
+  stateData Json? @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([appId, constellationId])
 }
 
-
 // Tracks window positions, sizes, and states
 model WindowState {
-  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  appId           String   // App this window belongs to
-  
+  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  appId String // App this window belongs to
+
   // Position and size
-  position        Json     @default("{\"x\":0,\"y\":0}")
-  size            Json     @default("{\"width\":800,\"height\":600}")
-  
+  position Json @default("{\"x\":0,\"y\":0}")
+  size     Json @default("{\"width\":800,\"height\":600}")
+
   // State
-  isMinimized     Boolean  @default(false)
-  isMaximized     Boolean  @default(false)
-  zIndex          Int      @default(0)
-  
+  isMinimized Boolean @default(false)
+  isMaximized Boolean @default(false)
+  zIndex      Int     @default(0)
+
   // Constellation this state belongs to
-  constellationId String   @db.Uuid
+  constellationId String        @db.Uuid
   constellation   Constellation @relation(fields: [constellationId], references: [id], onDelete: Cascade)
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Group of related Auroras (functional domains)
 model Aura {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   description String?
-  
+
   // Cosmos ownership
-  cosmosId    String   @db.Uuid
-  cosmos      Cosmos   @relation(fields: [cosmosId], references: [id], onDelete: Cascade)
-  
+  cosmosId String @db.Uuid
+  cosmos   Cosmos @relation(fields: [cosmosId], references: [id], onDelete: Cascade)
+
   // Content
-  auroras     Aurora[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  auroras Aurora[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Container for related streams
 model Aurora {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   description String?
-  
+
   // Hierarchy
-  auraId      String   @db.Uuid
-  aura        Aura     @relation(fields: [auraId], references: [id], onDelete: Cascade)
-  
+  auraId String @db.Uuid
+  aura   Aura   @relation(fields: [auraId], references: [id], onDelete: Cascade)
+
   // Content
-  streams     Stream[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  streams Stream[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Container for related flows
 model Stream {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
   description String?
-  
+
   // Hierarchy
-  auroraId    String   @db.Uuid
-  aurora      Aurora   @relation(fields: [auroraId], references: [id], onDelete: Cascade)
-  
+  auroraId String @db.Uuid
+  aurora   Aurora @relation(fields: [auroraId], references: [id], onDelete: Cascade)
+
   // Content
-  flows       Flow[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  flows Flow[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Design system flows
@@ -258,85 +257,85 @@ model Flow {
   name        String
   description String?
   type        FlowType
-  
+
   // Hierarchy
-  streamId    String   @db.Uuid
-  stream      Stream   @relation(fields: [streamId], references: [id], onDelete: Cascade)
-  
+  streamId String @db.Uuid
+  stream   Stream @relation(fields: [streamId], references: [id], onDelete: Cascade)
+
   // For CONFIG flows - target app
-  appId       String?
-  
+  appId String?
+
   // For CONFIG flows - reference to CORE flow
-  referencesFlowId String? @db.Uuid
-  referencesFlow Flow?    @relation("FlowReference", fields: [referencesFlowId], references: [id])
-  referencedByFlows Flow[] @relation("FlowReference")
-  
+  referencesFlowId  String? @db.Uuid
+  referencesFlow    Flow?   @relation("FlowReference", fields: [referencesFlowId], references: [id])
+  referencedByFlows Flow[]  @relation("FlowReference")
+
   // Components and tokens
-  components  FlowComponent[]
-  
+  components FlowComponent[]
+
   // Active in app states
   activeInAppStates AppState[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Component styling within a flow
 model FlowComponent {
-  id            String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String
-  type          String  // COLOR, TYPOGRAPHY, WALLPAPER, DOCK_ICON, CURSOR, etc.
-  
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String
+  type String // COLOR, TYPOGRAPHY, WALLPAPER, DOCK_ICON, CURSOR, etc.
+
   // For visual components
-  mode          String? // color, image, gradient
-  value         String? // actual value or path
-  
+  mode  String? // color, image, gradient
+  value String? // actual value or path
+
   // For styling references
-  tokenId       String? // Reference to a token in a CORE flow
-  tokenValue    String? // Resolved value from token
-  
+  tokenId    String? // Reference to a token in a CORE flow
+  tokenValue String? // Resolved value from token
+
   // For borders/outlines
-  outlineMode   String?
-  outlineValue  String?
+  outlineMode    String?
+  outlineValue   String?
   outlineTokenId String?
-  
+
   // Additional styling properties
-  opacity       Int?
-  fontFamily    String?
-  strokeWidth   Float?
-  
+  opacity     Int?
+  fontFamily  String?
+  strokeWidth Float?
+
   // Media reference
-  mediaId       String?
-  mediaUrl      String?
-  
+  mediaId  String?
+  mediaUrl String?
+
   // For component ordering
-  order         Int
-  
+  order Int
+
   // Relationship
-  flowId        String  @db.Uuid
-  flow          Flow    @relation(fields: [flowId], references: [id], onDelete: Cascade)
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  flowId String @db.Uuid
+  flow   Flow   @relation(fields: [flowId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Media model for file references
 model Media {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name         String?
-  url          String?
-  type         String?
-  screen       String?
-  mic          String?
-  camera       String?
-  preset       PRESET   @default(SD)
-  
+  id     String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name   String?
+  url    String?
+  type   String?
+  screen String?
+  mic    String?
+  camera String?
+  preset PRESET  @default(SD)
+
   // User ownership
-  userId       String?  @unique @db.Uuid
-  user         User?    @relation(fields: [userId], references: [id])
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  userId String? @unique @db.Uuid
+  user   User?   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Comment {
