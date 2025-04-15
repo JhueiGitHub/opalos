@@ -1,9 +1,14 @@
 // src/app/page.tsx
-
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { onAuthenticateUser } from "@/actions/user";
 import { getWallpaperStyle } from "@/actions/styling";
+import { getCosmosHierarchy } from "@/actions/debug";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 import Desktop from "./components/Desktop";
 
 export default async function Home() {
@@ -24,9 +29,18 @@ export default async function Home() {
   // Get wallpaper style from database
   const wallpaperStyle = await getWallpaperStyle();
 
+  // Initialize QueryClient and prefetch cosmos data
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["cosmos-hierarchy"],
+    queryFn: getCosmosHierarchy,
+  });
+
   return (
-    <div className="w-screen h-screen" style={wallpaperStyle}>
-      <Desktop />
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="w-screen h-screen" style={wallpaperStyle}>
+        <Desktop />
+      </div>
+    </HydrationBoundary>
   );
 }

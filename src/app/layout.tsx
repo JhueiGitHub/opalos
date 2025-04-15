@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import ReactQueryClientProvider from "@/react-query";
 
 export const metadata: Metadata = {
   title: "Orion",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body>{children}</body>
+        <body>
+          <ReactQueryClientProvider>{children}</ReactQueryClientProvider>
+        </body>
       </html>
     </ClerkProvider>
   );
