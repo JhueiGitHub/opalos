@@ -61,7 +61,32 @@ interface WindowState {
   tileWindows: () => void;
   cascadeWindows: () => void;
   syncToDatabase: () => Promise<void>;
+  // Add these new actions
+  snapWindowLeft: (appId: string) => void;
+  snapWindowRight: (appId: string) => void;
+  snapWindowTop: (appId: string) => void;
+  snapWindowBottom: (appId: string) => void;
+  // Corners
+  snapWindowTopLeft: (appId: string) => void;
+  snapWindowTopRight: (appId: string) => void;
+  snapWindowBottomLeft: (appId: string) => void;
+  snapWindowBottomRight: (appId: string) => void;
 }
+
+// Add these new snap layout constants
+export const LAYOUTS = {
+  FLOATING: "floating",
+  TILING: "tiling",
+  MAXIMIZED: "maximized",
+  SNAP_LEFT: "snap-left",
+  SNAP_RIGHT: "snap-right",
+  SNAP_TOP: "snap-top",
+  SNAP_BOTTOM: "snap-bottom",
+  SNAP_TOP_LEFT: "snap-top-left",
+  SNAP_TOP_RIGHT: "snap-top-right",
+  SNAP_BOTTOM_LEFT: "snap-bottom-left",
+  SNAP_BOTTOM_RIGHT: "snap-bottom-right",
+};
 
 export const useWindowStore = create<WindowState>((set, get) => ({
   openApps: [],
@@ -642,5 +667,242 @@ export const useWindowStore = create<WindowState>((set, get) => ({
     for (const appId in windowData) {
       await saveWindowState(windowData[appId]);
     }
+  },
+  snapWindowLeft: (appId) => {
+    const { windowData } = get();
+    if (!windowData[appId]) return;
+
+    const updatedWindowData = {
+      ...windowData,
+      [appId]: {
+        ...windowData[appId],
+        isMaximized: false,
+        isMinimized: false,
+        position: { x: 0, y: 0 },
+        size: { width: window.innerWidth / 2, height: window.innerHeight - 80 },
+        layout: LAYOUTS.SNAP_LEFT,
+        zIndex:
+          Math.max(...Object.values(windowData).map((w) => w.zIndex), 0) + 1,
+      },
+    };
+
+    set({
+      windowData: updatedWindowData,
+      activeAppId: appId,
+    });
+
+    // Sync to database
+    saveWindowState(updatedWindowData[appId]);
+  },
+
+  snapWindowRight: (appId) => {
+    const { windowData } = get();
+    if (!windowData[appId]) return;
+
+    const updatedWindowData = {
+      ...windowData,
+      [appId]: {
+        ...windowData[appId],
+        isMaximized: false,
+        isMinimized: false,
+        position: { x: window.innerWidth / 2, y: 0 },
+        size: { width: window.innerWidth / 2, height: window.innerHeight - 80 },
+        layout: LAYOUTS.SNAP_RIGHT,
+        zIndex:
+          Math.max(...Object.values(windowData).map((w) => w.zIndex), 0) + 1,
+      },
+    };
+
+    set({
+      windowData: updatedWindowData,
+      activeAppId: appId,
+    });
+
+    // Sync to database
+    saveWindowState(updatedWindowData[appId]);
+  },
+
+  snapWindowTop: (appId) => {
+    const { windowData } = get();
+    if (!windowData[appId]) return;
+
+    const updatedWindowData = {
+      ...windowData,
+      [appId]: {
+        ...windowData[appId],
+        isMaximized: false,
+        isMinimized: false,
+        position: { x: 0, y: 0 },
+        size: {
+          width: window.innerWidth,
+          height: (window.innerHeight - 80) / 2,
+        },
+        layout: LAYOUTS.SNAP_TOP,
+        zIndex:
+          Math.max(...Object.values(windowData).map((w) => w.zIndex), 0) + 1,
+      },
+    };
+
+    set({
+      windowData: updatedWindowData,
+      activeAppId: appId,
+    });
+
+    // Sync to database
+    saveWindowState(updatedWindowData[appId]);
+  },
+
+  snapWindowBottom: (appId) => {
+    const { windowData } = get();
+    if (!windowData[appId]) return;
+
+    const updatedWindowData = {
+      ...windowData,
+      [appId]: {
+        ...windowData[appId],
+        isMaximized: false,
+        isMinimized: false,
+        position: { x: 0, y: (window.innerHeight - 80) / 2 },
+        size: {
+          width: window.innerWidth,
+          height: (window.innerHeight - 80) / 2,
+        },
+        layout: LAYOUTS.SNAP_BOTTOM,
+        zIndex:
+          Math.max(...Object.values(windowData).map((w) => w.zIndex), 0) + 1,
+      },
+    };
+
+    set({
+      windowData: updatedWindowData,
+      activeAppId: appId,
+    });
+
+    // Sync to database
+    saveWindowState(updatedWindowData[appId]);
+  },
+
+  // Corner snaps
+  snapWindowTopLeft: (appId) => {
+    const { windowData } = get();
+    if (!windowData[appId]) return;
+
+    const updatedWindowData = {
+      ...windowData,
+      [appId]: {
+        ...windowData[appId],
+        isMaximized: false,
+        isMinimized: false,
+        position: { x: 0, y: 0 },
+        size: {
+          width: window.innerWidth / 2,
+          height: (window.innerHeight - 80) / 2,
+        },
+        layout: LAYOUTS.SNAP_TOP_LEFT,
+        zIndex:
+          Math.max(...Object.values(windowData).map((w) => w.zIndex), 0) + 1,
+      },
+    };
+
+    set({
+      windowData: updatedWindowData,
+      activeAppId: appId,
+    });
+
+    // Sync to database
+    saveWindowState(updatedWindowData[appId]);
+  },
+
+  snapWindowTopRight: (appId) => {
+    const { windowData } = get();
+    if (!windowData[appId]) return;
+
+    const updatedWindowData = {
+      ...windowData,
+      [appId]: {
+        ...windowData[appId],
+        isMaximized: false,
+        isMinimized: false,
+        position: { x: window.innerWidth / 2, y: 0 },
+        size: {
+          width: window.innerWidth / 2,
+          height: (window.innerHeight - 80) / 2,
+        },
+        layout: LAYOUTS.SNAP_TOP_RIGHT,
+        zIndex:
+          Math.max(...Object.values(windowData).map((w) => w.zIndex), 0) + 1,
+      },
+    };
+
+    set({
+      windowData: updatedWindowData,
+      activeAppId: appId,
+    });
+
+    // Sync to database
+    saveWindowState(updatedWindowData[appId]);
+  },
+
+  snapWindowBottomLeft: (appId) => {
+    const { windowData } = get();
+    if (!windowData[appId]) return;
+
+    const updatedWindowData = {
+      ...windowData,
+      [appId]: {
+        ...windowData[appId],
+        isMaximized: false,
+        isMinimized: false,
+        position: { x: 0, y: (window.innerHeight - 80) / 2 },
+        size: {
+          width: window.innerWidth / 2,
+          height: (window.innerHeight - 80) / 2,
+        },
+        layout: LAYOUTS.SNAP_BOTTOM_LEFT,
+        zIndex:
+          Math.max(...Object.values(windowData).map((w) => w.zIndex), 0) + 1,
+      },
+    };
+
+    set({
+      windowData: updatedWindowData,
+      activeAppId: appId,
+    });
+
+    // Sync to database
+    saveWindowState(updatedWindowData[appId]);
+  },
+
+  snapWindowBottomRight: (appId) => {
+    const { windowData } = get();
+    if (!windowData[appId]) return;
+
+    const updatedWindowData = {
+      ...windowData,
+      [appId]: {
+        ...windowData[appId],
+        isMaximized: false,
+        isMinimized: false,
+        position: {
+          x: window.innerWidth / 2,
+          y: (window.innerHeight - 80) / 2,
+        },
+        size: {
+          width: window.innerWidth / 2,
+          height: (window.innerHeight - 80) / 2,
+        },
+        layout: LAYOUTS.SNAP_BOTTOM_RIGHT,
+        zIndex:
+          Math.max(...Object.values(windowData).map((w) => w.zIndex), 0) + 1,
+      },
+    };
+
+    set({
+      windowData: updatedWindowData,
+      activeAppId: appId,
+    });
+
+    // Sync to database
+    saveWindowState(updatedWindowData[appId]);
   },
 }));

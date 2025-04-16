@@ -18,7 +18,7 @@ import {
   IconLayoutGrid,
   IconLayoutColumns,
 } from "@tabler/icons-react";
-import { toast } from "sonner";
+import { useWindowShortcuts } from "@/hooks/use-window-shortcuts";
 
 // Type-safe icon mapping
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -69,6 +69,8 @@ const Desktop: React.FC<DesktopProps> = ({ iconStyles = [] }) => {
     switchWorkspace,
     isInitialized,
   } = useWindowStore();
+
+  useWindowShortcuts();
 
   useEffect(() => {
     // Initialize window states from database

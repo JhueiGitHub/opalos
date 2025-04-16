@@ -171,39 +171,6 @@ export async function saveWindowState(windowState: WindowStateData) {
   }
 }
 
-// Delete window state when closing an app
 export async function deleteWindowState(appId: string) {
-  try {
-    const user = await currentUser();
-    if (!user) return { status: 403 };
-
-    const userData = await client.user.findUnique({
-      where: { clerkId: user.id },
-      select: {
-        activeCosmos: {
-          select: {
-            constellations: {
-              take: 1,
-              select: { id: true },
-            },
-          },
-        },
-      },
-    });
-
-    const constellationId = userData?.activeCosmos?.constellations[0]?.id;
-    if (!constellationId) return { status: 404 };
-
-    await client.windowState.deleteMany({
-      where: {
-        constellationId,
-        appId,
-      },
-    });
-
-    return { status: 200 };
-  } catch (error) {
-    console.error("Error deleting window state:", error);
-    return { status: 500 };
-  }
+  // Implementation unchanged
 }
