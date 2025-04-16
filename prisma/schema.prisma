@@ -63,6 +63,55 @@ model Cosmos {
   updatedAt DateTime @updatedAt
 }
 
+
+// A constellation tracks OS states and configurations
+model Constellation {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  description String?
+
+  // Cosmos ownership
+  cosmosId String @db.Uuid
+  cosmos   Cosmos @relation(fields: [cosmosId], references: [id], onDelete: Cascade)
+
+  dockConfig DockConfig?
+
+  // Tracks active flows for each app
+  appStates AppState[]
+
+  // Tracks window states
+  windowStates WindowState[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Add to prisma/schema.prisma
+model DockConfig {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  constellationId String        @unique @db.Uuid
+  constellation   Constellation @relation(fields: [constellationId], references: [id], onDelete: Cascade)
+  items           DockItem[]
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model DockItem {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  appId           String        // "stellar", "flow", etc.
+  position        Int
+  
+  dockConfigId    String        @db.Uuid
+  dockConfig      DockConfig    @relation(fields: [dockConfigId], references: [id], onDelete: Cascade)
+  
+  // Optional styling reference
+  flowComponentId String?       @db.Uuid
+  flowComponent   FlowComponent? @relation(fields: [flowComponentId], references: [id])
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
 // Stellar Drive model - unchanged from ZenithOS
 model StellarDrive {
   id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -131,26 +180,6 @@ model StellarFile {
   // Folder ownership
   folderId String        @db.Uuid
   folder   StellarFolder @relation(fields: [folderId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// A constellation tracks OS states and configurations
-model Constellation {
-  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String
-  description String?
-
-  // Cosmos ownership
-  cosmosId String @db.Uuid
-  cosmos   Cosmos @relation(fields: [cosmosId], references: [id], onDelete: Cascade)
-
-  // Tracks active flows for each app
-  appStates AppState[]
-
-  // Tracks window states
-  windowStates WindowState[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -315,8 +344,9 @@ model FlowComponent {
   flowId String @db.Uuid
   flow   Flow   @relation(fields: [flowId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  dockItems  DockItem[]
 }
 
 // Media model for file references

@@ -81,8 +81,8 @@ export const onAuthenticateUser = async () => {
       // 2. Create default Cosmos
       const cosmos = await tx.cosmos.create({
         data: {
-          name: "Zenith Universe",
-          description: "Default design universe",
+          name: "Dopa",
+          description: "Default Cosmos",
           userId: createdUser.id,
         },
       });
@@ -168,8 +168,8 @@ export const onAuthenticateUser = async () => {
       // 7. Create default Constellation for OS state
       const constellation = await tx.constellation.create({
         data: {
-          name: "Default",
-          description: "Default OS configuration",
+          name: "Orion",
+          description: "Default Constellation",
           cosmosId: cosmos.id,
         },
       });
@@ -177,8 +177,8 @@ export const onAuthenticateUser = async () => {
       // 8. Create default Aura
       const aura = await tx.aura.create({
         data: {
-          name: "System",
-          description: "Core system styling",
+          name: "Noire",
+          description: "Default Aura",
           cosmosId: cosmos.id,
         },
       });
@@ -186,8 +186,8 @@ export const onAuthenticateUser = async () => {
       // 9. Create default Aurora
       const aurora = await tx.aurora.create({
         data: {
-          name: "Zenith",
-          description: "Zenith design system",
+          name: "Luna",
+          description: "Default Aurora",
           auraId: aura.id,
         },
       });
@@ -196,7 +196,7 @@ export const onAuthenticateUser = async () => {
       const coreStream = await tx.stream.create({
         data: {
           name: "Core",
-          description: "Core design tokens",
+          description: "Default Core Stream",
           auroraId: aurora.id,
         },
       });
@@ -205,7 +205,7 @@ export const onAuthenticateUser = async () => {
       const configStream = await tx.stream.create({
         data: {
           name: "Config",
-          description: "App configuration mappings",
+          description: "Default Orion Config Stream",
           auroraId: aurora.id,
         },
       });
@@ -214,7 +214,7 @@ export const onAuthenticateUser = async () => {
       const coreFlow = await tx.flow.create({
         data: {
           name: "Zenith",
-          description: "Core design system tokens",
+          description: "Default Core Flow",
           type: FlowType.CORE,
           streamId: coreStream.id,
           components: {
@@ -476,8 +476,8 @@ export const onAuthenticateUser = async () => {
       // 13. Create Config Flow for Orion OS with mappings
       const orionConfigFlow = await tx.flow.create({
         data: {
-          name: "Zenith Orion",
-          description: "Zenith styling for Orion OS",
+          name: "Zenithn",
+          description: "Default Orion Config Flow",
           type: FlowType.CONFIG,
           appId: "orion",
           streamId: configStream.id,
@@ -496,25 +496,25 @@ export const onAuthenticateUser = async () => {
                   name: "Finder",
                   type: "DOCK_ICON",
                   mode: "color",
-                  tokenId: "smoke-med",
+                  tokenId: "black",
                   outlineMode: "color",
-                  outlineTokenId: "latte-med",
+                  outlineTokenId: "latte",
                   order: 1,
                 },
                 {
                   name: "Flow",
                   type: "DOCK_ICON",
                   mode: "color",
-                  tokenId: "smoke-med",
+                  tokenId: "black",
                   outlineMode: "color",
-                  outlineTokenId: "latte-med",
+                  outlineTokenId: "latte",
                   order: 2,
                 },
                 {
                   name: "Discord",
                   type: "DOCK_ICON",
                   mode: "color",
-                  tokenId: "smoke-med",
+                  tokenId: "black",
                   outlineMode: "color",
                   outlineTokenId: "latte-med",
                   order: 3,
@@ -523,7 +523,7 @@ export const onAuthenticateUser = async () => {
                   name: "Anki",
                   type: "DOCK_ICON",
                   mode: "color",
-                  tokenId: "smoke-med",
+                  tokenId: "black",
                   outlineMode: "color",
                   outlineTokenId: "latte-med",
                   order: 4,
@@ -532,16 +532,16 @@ export const onAuthenticateUser = async () => {
                   name: "Stellar",
                   type: "DOCK_ICON",
                   mode: "color",
-                  tokenId: "smoke-med",
+                  tokenId: "latte",
                   outlineMode: "color",
-                  outlineTokenId: "latte-med",
+                  outlineTokenId: "black",
                   order: 5,
                 },
                 {
                   name: "Terminal",
                   type: "DOCK_ICON",
                   mode: "color",
-                  tokenId: "smoke-med",
+                  tokenId: "black",
                   outlineMode: "color",
                   outlineTokenId: "latte-med",
                   order: 6,
@@ -550,7 +550,7 @@ export const onAuthenticateUser = async () => {
                   name: "Settings",
                   type: "DOCK_ICON",
                   mode: "color",
-                  tokenId: "smoke-med",
+                  tokenId: "black",
                   outlineMode: "color",
                   outlineTokenId: "latte-med",
                   order: 7,
@@ -559,7 +559,7 @@ export const onAuthenticateUser = async () => {
                   name: "GitHub",
                   type: "DOCK_ICON",
                   mode: "color",
-                  tokenId: "smoke-med",
+                  tokenId: "black",
                   outlineMode: "color",
                   outlineTokenId: "latte-med",
                   order: 8,
@@ -568,13 +568,49 @@ export const onAuthenticateUser = async () => {
                   name: "Cursor",
                   type: "CURSOR",
                   mode: "color",
-                  tokenId: "latte-inner",
+                  tokenId: "black",
                   outlineMode: "color",
                   outlineTokenId: "latte-outer",
                   order: 9,
                 },
               ],
             },
+          },
+        },
+      });
+
+      // Create default DockConfig with stellar, flow, studio
+      const dockConfig = await tx.dockConfig.create({
+        data: {
+          constellationId: constellation.id,
+          items: {
+            create: [
+              {
+                appId: "stellar",
+                position: 0,
+                // Optionally link to component
+                flowComponentId: (
+                  await tx.flowComponent.findFirst({
+                    where: {
+                      flowId: orionConfigFlow.id,
+                      name: "Stellar",
+                    },
+                  })
+                )?.id,
+              },
+              {
+                appId: "flow",
+                position: 1,
+                flowComponentId: (
+                  await tx.flowComponent.findFirst({
+                    where: {
+                      flowId: orionConfigFlow.id,
+                      name: "Flow",
+                    },
+                  })
+                )?.id,
+              },
+            ],
           },
         },
       });
