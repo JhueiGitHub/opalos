@@ -18,10 +18,12 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 
 // Define the item interface right after imports
+// Update the DockItem interface
 interface DockItem {
   title: string;
   icon: React.ReactNode;
   href: string;
+  onClick?: (e: React.MouseEvent) => void;
   style?: {
     name?: string;
     color?: string;
@@ -127,18 +129,20 @@ const FloatingDockDesktop = ({
   );
 };
 
-// Update the IconContainer function
+// Then update the IconContainer component
 function IconContainer({
   mouseX,
   title,
   icon,
   href,
+  onClick,
   style = {},
 }: {
   mouseX: MotionValue;
   title: string;
   icon: React.ReactNode;
   href: string;
+  onClick?: (e: React.MouseEvent) => void;
   style?: {
     name?: string;
     color?: string;
@@ -195,7 +199,7 @@ function IconContainer({
   const outlineOpacity = style.outlineOpacity || 0.72;
 
   return (
-    <Link href={href}>
+    <Link href={href} onClick={onClick}>
       <motion.div
         ref={ref}
         style={{

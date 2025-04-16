@@ -4,6 +4,8 @@
 import React, { useEffect, useState } from "react";
 import { FloatingDock } from "@/components/ace/floating-dock";
 import { getActiveDockItems, DockItem } from "@/actions/dock";
+import { useWindowStore } from "@/store/windowStore";
+import { AppWindow } from "@/components/window/AppWindow";
 import {
   IconFolder,
   IconPalette,
@@ -44,7 +46,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   ),
 };
 
-// Mapping between app IDs and component names
+// App name mapping
 const APP_TO_COMPONENT_MAP: Record<string, string> = {
   stellar: "Stellar",
   flow: "Flow",
@@ -57,7 +59,13 @@ const APP_TO_COMPONENT_MAP: Record<string, string> = {
   anki: "Anki",
 };
 
-// Define props interface
+// App title mapping
+const APP_TITLES: Record<string, string> = {
+  stellar: "Stellar File Manager",
+  flow: "Flow Design System",
+  studio: "Studio",
+};
+
 interface DesktopProps {
   iconStyles?: Array<{
     name: string;
@@ -69,8 +77,8 @@ interface DesktopProps {
 }
 
 const Desktop: React.FC<DesktopProps> = ({ iconStyles = [] }) => {
-  // Properly typed state
   const [dockItems, setDockItems] = useState<DockItem[]>([]);
+  const { openApps, openApp, minimizedApps } = useWindowStore();
 
   useEffect(() => {
     async function loadDockItems() {
@@ -82,35 +90,47 @@ const Desktop: React.FC<DesktopProps> = ({ iconStyles = [] }) => {
     loadDockItems();
   }, []);
 
-  // Create links for FloatingDock with style mapping
+  // Create links for FloatingDock with click handlers
   const links = dockItems.map((item) => {
-    // Safe access to icon map with fallback
+    // Icon and style mapping
     const iconKey = item.app.icon;
     const icon =
       iconKey in ICON_MAP ? ICON_MAP[iconKey] : ICON_MAP["IconFolder"];
-
-    // Find matching style from iconStyles prop
-    // Use the mapping to connect app IDs to component names
     const componentName = APP_TO_COMPONENT_MAP[item.appId] || item.appId;
     const style =
       iconStyles.find((s) => s.name === componentName) || item.style || {};
-
-    console.log(`App: ${item.appId}, Component: ${componentName}`, style);
 
     return {
       title: item.app.name,
       icon: icon,
       href: "#",
       style: style,
+      onClick: (e: React.MouseEvent) => {
+        e.preventDefault();
+        openApp(item.appId);
+      },
     };
   });
 
   return (
     <div className="w-full h-full flex items-center justify-center">
+      {/* Render open app windows */}
+      {openApps
+        .filter((appId) => !minimizedApps.includes(appId))
+        .map((appId) => (
+          <AppWindow
+            key={appId}
+            appId={appId}
+            title={APP_TITLES[appId] || appId}
+          />
+        ))}
+
       <span className="text-[#4C4F69]">Desktop</span>
+
       <div className="absolute bottom-[9px]">
         <FloatingDock items={links} />
       </div>
+
       <CosmosDebugView />
     </div>
   );
