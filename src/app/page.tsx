@@ -2,7 +2,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { onAuthenticateUser } from "@/actions/user";
-import { getWallpaperStyle } from "@/actions/styling";
+import { getWallpaperStyle, getDockIconStyles } from "@/actions/styling";
 import { getCosmosHierarchy } from "@/actions/debug";
 import {
   dehydrate,
@@ -26,8 +26,9 @@ export default async function Home() {
     return redirect("/auth/sign-in");
   }
 
-  // Get wallpaper style from database
+  // Get wallpaper and dock icon styles from database
   const wallpaperStyle = await getWallpaperStyle();
+  const dockIconStyles = await getDockIconStyles();
 
   // Initialize QueryClient and prefetch cosmos data
   const queryClient = new QueryClient();
@@ -39,7 +40,7 @@ export default async function Home() {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="w-screen h-screen" style={wallpaperStyle}>
-        <Desktop />
+        <Desktop iconStyles={dockIconStyles} />
       </div>
     </HydrationBoundary>
   );

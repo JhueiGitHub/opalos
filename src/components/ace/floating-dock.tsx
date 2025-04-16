@@ -17,12 +17,26 @@ import {
 import Link from "next/link";
 import { useRef, useState } from "react";
 
+// Define the item interface right after imports
+interface DockItem {
+  title: string;
+  icon: React.ReactNode;
+  href: string;
+  style?: {
+    name?: string;
+    color?: string;
+    colorOpacity?: number;
+    outlineColor?: string;
+    outlineOpacity?: number;
+  };
+}
+
 export const FloatingDock = ({
   items,
   desktopClassName,
   mobileClassName,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: DockItem[];
   desktopClassName?: string;
   mobileClassName?: string;
 }) => {
@@ -113,16 +127,25 @@ const FloatingDockDesktop = ({
   );
 };
 
+// Update the IconContainer function
 function IconContainer({
   mouseX,
   title,
   icon,
   href,
+  style = {},
 }: {
   mouseX: MotionValue;
   title: string;
   icon: React.ReactNode;
   href: string;
+  style?: {
+    name?: string;
+    color?: string;
+    colorOpacity?: number;
+    outlineColor?: string;
+    outlineOpacity?: number;
+  };
 }) {
   let ref = useRef<HTMLDivElement>(null);
 
@@ -165,15 +188,27 @@ function IconContainer({
   });
 
   const [hovered, setHovered] = useState(false);
+  // Apply dynamic styles if available
+  const iconColor = style.color || "#CCCCCC";
+  const iconOpacity = style.colorOpacity || 0.72;
+  const outlineColor = style.outlineColor || "#4C4F69";
+  const outlineOpacity = style.outlineOpacity || 0.72;
 
   return (
     <Link href={href}>
       <motion.div
         ref={ref}
-        style={{ width, height }}
+        style={{
+          width,
+          height,
+          backgroundColor: iconColor,
+          opacity: iconOpacity,
+          borderColor: outlineColor,
+          borderWidth: "1px",
+        }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="aspect-square rounded-full bg-black/30 dark:bg-neutral-800 flex items-center justify-center relative"
+        className="aspect-square rounded-full flex items-center justify-center relative"
       >
         <AnimatePresence>
           {hovered && (
