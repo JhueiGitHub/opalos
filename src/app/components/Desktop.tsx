@@ -125,13 +125,11 @@ const Desktop: React.FC<DesktopProps> = ({ iconStyles = [] }) => {
           />
         ))}
 
-      <span className="text-[#4C4F69]">Desktop</span>
-
       <div className="absolute bottom-[9px]">
         <FloatingDock items={links} />
       </div>
 
-      <CosmosDebugView />
+      {/* <CosmosDebugView /> */}
     </div>
   );
 };

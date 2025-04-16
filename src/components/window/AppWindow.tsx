@@ -24,7 +24,7 @@ export const AppWindow: React.FC<AppWindowProps> = ({ appId, title }) => {
 
   return (
     <div
-      className={`fixed top-8 left-12 w-2/3 h-3/4 rounded-lg overflow-hidden 
+      className={`w-full h-full rounded-lg overflow-hidden 
                  bg-black bg-opacity-30 backdrop-filter backdrop-blur-md 
                  border border-white border-opacity-10 
                  ${isActive ? "z-20" : "z-10"}`}
