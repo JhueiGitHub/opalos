@@ -628,19 +628,6 @@ export const onAuthenticateUser = async () => {
         },
       });
 
-      // 15. Create Window State for default window positions
-      await tx.windowState.create({
-        data: {
-          appId: "finder",
-          position: { x: 100, y: 100 },
-          size: { width: 800, height: 600 },
-          isMinimized: false,
-          isMaximized: false,
-          zIndex: 1,
-          constellationId: constellation.id,
-        },
-      });
-
       return createdUser;
     });
 

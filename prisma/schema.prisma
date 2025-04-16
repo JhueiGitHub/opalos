@@ -207,7 +207,7 @@ model AppState {
   @@unique([appId, constellationId])
 }
 
-// Tracks window positions, sizes, and states
+// Add this to prisma/schema.prisma
 model WindowState {
   id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   appId String // App this window belongs to
@@ -220,6 +220,9 @@ model WindowState {
   isMinimized Boolean @default(false)
   isMaximized Boolean @default(false)
   zIndex      Int     @default(0)
+  
+  // HyprLand-specific state data (layout, workspace, etc.)
+  stateData   Json?   @default("{}")
 
   // Constellation this state belongs to
   constellationId String        @db.Uuid

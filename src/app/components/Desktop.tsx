@@ -15,8 +15,10 @@ import {
   IconBrandGithub,
   IconBrandDiscord,
   IconBrandX,
+  IconLayoutGrid,
+  IconLayoutColumns,
 } from "@tabler/icons-react";
-import CosmosDebugView from "@/components/debug/CosmosDebugView";
+import { toast } from "sonner";
 
 // Type-safe icon mapping
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -26,44 +28,21 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   IconPalette: (
     <IconPalette className="h-full w-full text-[#4C4F69] dark:text-neutral-300" />
   ),
-  IconVideo: (
-    <IconVideo className="h-full w-full text-[#4C4F69] dark:text-neutral-300" />
-  ),
-  IconTerminal2: (
-    <IconTerminal2 className="h-full w-full text-[#4C4F69] dark:text-neutral-300" />
-  ),
-  IconSettings: (
-    <IconSettings className="h-full w-full text-[#4C4F69] dark:text-neutral-300" />
-  ),
-  IconBrandGithub: (
-    <IconBrandGithub className="h-full w-full text-[#4C4F69] dark:text-neutral-300" />
-  ),
-  IconBrandDiscord: (
-    <IconBrandDiscord className="h-full w-full text-[#4C4F69] dark:text-neutral-300" />
-  ),
-  IconBrandX: (
-    <IconBrandX className="h-full w-full text-[#4C4F69] dark:text-neutral-300" />
-  ),
+  // ... other icons
 };
 
 // App name mapping
 const APP_TO_COMPONENT_MAP: Record<string, string> = {
   stellar: "Stellar",
   flow: "Flow",
-  studio: "Studio",
-  terminal: "Terminal",
-  github: "GitHub",
-  settings: "Settings",
-  finder: "Finder",
-  discord: "Discord",
-  anki: "Anki",
+  // ... other apps
 };
 
 // App title mapping
 const APP_TITLES: Record<string, string> = {
   stellar: "Stellar File Manager",
   flow: "Flow Design System",
-  studio: "Studio",
+  // ... other app titles
 };
 
 interface DesktopProps {
@@ -78,9 +57,24 @@ interface DesktopProps {
 
 const Desktop: React.FC<DesktopProps> = ({ iconStyles = [] }) => {
   const [dockItems, setDockItems] = useState<DockItem[]>([]);
-  const { openApps, openApp, minimizedApps } = useWindowStore();
+  const {
+    openApps,
+    openApp,
+    windowData,
+    initialize,
+    tileWindows,
+    cascadeWindows,
+    currentWorkspace,
+    workspaces,
+    switchWorkspace,
+    isInitialized,
+  } = useWindowStore();
 
   useEffect(() => {
+    // Initialize window states from database
+    initialize();
+
+    // Load dock items
     async function loadDockItems() {
       const result = await getActiveDockItems();
       if (result.status === 200) {
@@ -91,45 +85,100 @@ const Desktop: React.FC<DesktopProps> = ({ iconStyles = [] }) => {
   }, []);
 
   // Create links for FloatingDock with click handlers
-  const links = dockItems.map((item) => {
-    // Icon and style mapping
-    const iconKey = item.app.icon;
-    const icon =
-      iconKey in ICON_MAP ? ICON_MAP[iconKey] : ICON_MAP["IconFolder"];
-    const componentName = APP_TO_COMPONENT_MAP[item.appId] || item.appId;
-    const style =
-      iconStyles.find((s) => s.name === componentName) || item.style || {};
+  const links = [
+    ...dockItems.map((item) => {
+      // Icon and style mapping
+      const iconKey = item.app.icon;
+      const icon =
+        iconKey in ICON_MAP ? ICON_MAP[iconKey] : ICON_MAP["IconFolder"];
+      const componentName = APP_TO_COMPONENT_MAP[item.appId] || item.appId;
+      const style =
+        iconStyles.find((s) => s.name === componentName) || item.style || {};
 
-    return {
-      title: item.app.name,
-      icon: icon,
+      return {
+        title: item.app.name,
+        icon: icon,
+        href: "#",
+        style: style,
+        onClick: (e: React.MouseEvent) => {
+          e.preventDefault();
+          openApp(item.appId);
+        },
+      };
+    }),
+    // Add window management buttons
+    {
+      title: "Tile Windows",
+      icon: (
+        <IconLayoutGrid className="h-full w-full text-[#4C4F69] dark:text-neutral-300" />
+      ),
       href: "#",
-      style: style,
       onClick: (e: React.MouseEvent) => {
         e.preventDefault();
-        openApp(item.appId);
+        tileWindows();
       },
-    };
-  });
+    },
+    {
+      title: "Cascade Windows",
+      icon: (
+        <IconLayoutColumns className="h-full w-full text-[#4C4F69] dark:text-neutral-300" />
+      ),
+      href: "#",
+      onClick: (e: React.MouseEvent) => {
+        e.preventDefault();
+        cascadeWindows();
+      },
+    },
+  ];
+
+  // Workspace selector
+  const renderWorkspaceSelector = () => {
+    if (workspaces.length <= 1) return null;
+
+    return (
+      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 flex space-x-2 bg-black bg-opacity-20 rounded-full px-4 py-1 backdrop-blur-md">
+        {workspaces.map((workspace) => (
+          <button
+            key={workspace}
+            onClick={() => switchWorkspace(workspace)}
+            className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
+              workspace === currentWorkspace
+                ? "bg-white bg-opacity-20 text-white"
+                : "text-white text-opacity-60 hover:text-opacity-100"
+            }`}
+          >
+            {workspace}
+          </button>
+        ))}
+      </div>
+    );
+  };
+
+  if (!isInitialized) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="animate-pulse text-white text-2xl">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full flex items-center justify-center">
+      {/* Workspace selector */}
+      {renderWorkspaceSelector()}
+
       {/* Render open app windows */}
-      {openApps
-        .filter((appId) => !minimizedApps.includes(appId))
-        .map((appId) => (
-          <AppWindow
-            key={appId}
-            appId={appId}
-            title={APP_TITLES[appId] || appId}
-          />
-        ))}
+      {openApps.map((appId) => (
+        <AppWindow
+          key={appId}
+          appId={appId}
+          title={APP_TITLES[appId] || appId}
+        />
+      ))}
 
       <div className="absolute bottom-[9px]">
         <FloatingDock items={links} />
       </div>
-
-      {/* <CosmosDebugView /> */}
     </div>
   );
 };
