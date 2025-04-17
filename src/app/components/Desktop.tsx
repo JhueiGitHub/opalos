@@ -19,6 +19,7 @@ import {
   IconLayoutColumns,
 } from "@tabler/icons-react";
 import { useWindowShortcuts } from "@/hooks/use-window-shortcuts";
+import { MenuBar } from "@/components/menubar/MenuBar";
 
 // Type-safe icon mapping
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -138,7 +139,7 @@ const Desktop: React.FC<DesktopProps> = ({ iconStyles = [] }) => {
     if (workspaces.length <= 1) return null;
 
     return (
-      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 flex space-x-2 bg-black bg-opacity-20 rounded-full px-4 py-1 backdrop-blur-md">
+      <div className="absolute top-12 left-1/2 transform -translate-x-1/2 flex space-x-2 bg-black bg-opacity-20 rounded-full px-4 py-1 backdrop-blur-md">
         {workspaces.map((workspace) => (
           <button
             key={workspace}
@@ -166,7 +167,10 @@ const Desktop: React.FC<DesktopProps> = ({ iconStyles = [] }) => {
 
   return (
     <div className="w-full h-full flex items-center justify-center">
-      {/* Workspace selector */}
+      {/* Menu bar */}
+      <MenuBar />
+
+      {/* Workspace selector - adjusted position for menu bar */}
       {renderWorkspaceSelector()}
 
       {/* Render open app windows */}

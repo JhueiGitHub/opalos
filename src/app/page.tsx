@@ -3,7 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { onAuthenticateUser } from "@/actions/user";
 import { getWallpaperStyle, getDockIconStyles } from "@/actions/styling";
-import { getCosmosHierarchy } from "@/actions/debug";
+import { getUserCosmos } from "@/actions/cosmos";
 import {
   dehydrate,
   HydrationBoundary,
@@ -32,9 +32,11 @@ export default async function Home() {
 
   // Initialize QueryClient and prefetch cosmos data
   const queryClient = new QueryClient();
+
+  // Prefetch only the cosmos list (much more efficient than the entire hierarchy)
   await queryClient.prefetchQuery({
-    queryKey: ["cosmos-hierarchy"],
-    queryFn: getCosmosHierarchy,
+    queryKey: ["user-cosmos"],
+    queryFn: getUserCosmos,
   });
 
   return (
