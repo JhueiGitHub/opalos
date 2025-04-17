@@ -79,13 +79,31 @@ export async function createCosmos(name: string, description?: string) {
 
     if (!userData) return { status: 404, data: null };
 
-    // Create new cosmos
-    const newCosmos = await client.cosmos.create({
-      data: {
-        name,
-        description: description || null,
-        userId: userData.id,
-      },
+    // Use transaction to create cosmos with default constellation
+    const newCosmos = await client.$transaction(async (tx) => {
+      // Create new cosmos
+      const cosmos = await tx.cosmos.create({
+        data: {
+          name,
+          description: description || null,
+          userId: userData.id,
+        },
+      });
+
+      // Create default constellation
+      const constellation = await tx.constellation.create({
+        data: {
+          name: "Default",
+          description: "Default Constellation",
+          cosmosId: cosmos.id,
+          // Initialize empty window states and dock config
+          dockConfig: {
+            create: {},
+          },
+        },
+      });
+
+      return cosmos;
     });
 
     return {

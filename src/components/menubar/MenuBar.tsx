@@ -36,10 +36,12 @@ export const MenuBar: React.FC = () => {
   const handleSetActiveCosmos = async (cosmosId: string) => {
     const result = await setActiveCosmos(cosmosId);
     if (result.status === 200) {
-      // Close dropdown and refetch data
+      // Close dropdown
       setIsCosmosOpen(false);
-      refetch();
       toast.success("Cosmos activated successfully");
+
+      // Force a page reload to reset all application state
+      window.location.reload();
     } else {
       toast.error("Failed to activate cosmos");
     }

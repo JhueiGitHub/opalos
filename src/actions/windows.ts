@@ -40,7 +40,7 @@ export async function getWindowStates() {
                     isMinimized: true,
                     isMaximized: true,
                     zIndex: true,
-                    stateData: true, // Will contain layout and workspace info
+                    stateData: true,
                   },
                   orderBy: { zIndex: "asc" },
                 },
@@ -51,8 +51,16 @@ export async function getWindowStates() {
       },
     });
 
-    const constellation = userData?.activeCosmos?.constellations[0];
-    if (!constellation) return { status: 404, data: [] as WindowStateData[] };
+    // Check if there's an active cosmos
+    if (!userData?.activeCosmos) {
+      return { status: 404, data: [] as WindowStateData[] };
+    }
+
+    // Get the first constellation (if any)
+    const constellation = userData.activeCosmos.constellations[0];
+    if (!constellation) {
+      return { status: 404, data: [] as WindowStateData[] };
+    }
 
     // Map and return window states
     const windowStates = constellation.windowStates.map((state) => {

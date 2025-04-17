@@ -17,8 +17,8 @@ export default function QueryClientProvider({
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 5 * 1000, // 5 seconds
-            refetchInterval: 10 * 1000, // 10 seconds - for real-time updates
+            staleTime: 0, // Don't cache cosmos-related data
+            refetchOnWindowFocus: true, // Refresh on window focus
           },
         },
       })

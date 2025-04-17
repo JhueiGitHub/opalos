@@ -101,6 +101,18 @@ export const useWindowStore = create<WindowState>((set, get) => ({
     try {
       const response = await getWindowStates();
 
+      // Handle the case where there's no constellation or window states
+      if (response.status === 404) {
+        set({
+          windowData: {},
+          openApps: [],
+          workspaces: [1],
+          isInitialized: true, // Still mark as initialized
+          constellationId: null,
+        });
+        return;
+      }
+
       if (response.status === 200) {
         const windowsMap: Record<string, WindowData> = {};
         const openApps: string[] = [];
@@ -150,6 +162,8 @@ export const useWindowStore = create<WindowState>((set, get) => ({
       }
     } catch (error) {
       console.error("Failed to initialize window state:", error);
+      // Even on error, set initialized to true to prevent loading screen
+      set({ isInitialized: true });
     }
   },
 
