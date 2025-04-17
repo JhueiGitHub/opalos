@@ -537,7 +537,7 @@ export const useWindowStore = create<WindowState>((set, get) => ({
       tiledWindows[appId] = {
         ...tiledWindows[appId],
         position: { x: 0, y: 0 },
-        size: { width: window.innerWidth, height: window.innerHeight - 80 }, // Account for dock
+        size: { width: window.innerWidth, height: window.innerHeight }, // Account for dock
         layout: "tiling",
       };
     } else if (visibleApps.length === 2) {
@@ -547,14 +547,14 @@ export const useWindowStore = create<WindowState>((set, get) => ({
       tiledWindows[app1] = {
         ...tiledWindows[app1],
         position: { x: 0, y: 0 },
-        size: { width: window.innerWidth / 2, height: window.innerHeight - 80 },
+        size: { width: window.innerWidth / 2, height: window.innerHeight },
         layout: "tiling",
       };
 
       tiledWindows[app2] = {
         ...tiledWindows[app2],
         position: { x: window.innerWidth / 2, y: 0 },
-        size: { width: window.innerWidth / 2, height: window.innerHeight - 80 },
+        size: { width: window.innerWidth / 2, height: window.innerHeight },
         layout: "tiling",
       };
     } else if (visibleApps.length === 3) {
@@ -564,7 +564,7 @@ export const useWindowStore = create<WindowState>((set, get) => ({
       tiledWindows[app1] = {
         ...tiledWindows[app1],
         position: { x: 0, y: 0 },
-        size: { width: window.innerWidth / 2, height: window.innerHeight - 80 },
+        size: { width: window.innerWidth / 2, height: window.innerHeight },
         layout: "tiling",
       };
 
@@ -573,7 +573,7 @@ export const useWindowStore = create<WindowState>((set, get) => ({
         position: { x: window.innerWidth / 2, y: 0 },
         size: {
           width: window.innerWidth / 2,
-          height: (window.innerHeight - 80) / 2,
+          height: window.innerHeight / 2,
         },
         layout: "tiling",
       };
@@ -582,11 +582,11 @@ export const useWindowStore = create<WindowState>((set, get) => ({
         ...tiledWindows[app3],
         position: {
           x: window.innerWidth / 2,
-          y: (window.innerHeight - 80) / 2,
+          y: window.innerHeight / 2,
         },
         size: {
           width: window.innerWidth / 2,
-          height: (window.innerHeight - 80) / 2,
+          height: window.innerHeight / 2,
         },
         layout: "tiling",
       };
@@ -596,7 +596,7 @@ export const useWindowStore = create<WindowState>((set, get) => ({
       const rows = Math.ceil(visibleApps.length / cols);
 
       const cellWidth = window.innerWidth / cols;
-      const cellHeight = (window.innerHeight - 80) / rows;
+      const cellHeight = window.innerHeight / rows;
 
       visibleApps.forEach((appId, index) => {
         const row = Math.floor(index / cols);
@@ -679,7 +679,7 @@ export const useWindowStore = create<WindowState>((set, get) => ({
         isMaximized: false,
         isMinimized: false,
         position: { x: 0, y: 0 },
-        size: { width: window.innerWidth / 2, height: window.innerHeight - 80 },
+        size: { width: window.innerWidth / 2, height: window.innerHeight },
         layout: LAYOUTS.SNAP_LEFT,
         zIndex:
           Math.max(...Object.values(windowData).map((w) => w.zIndex), 0) + 1,
@@ -706,7 +706,7 @@ export const useWindowStore = create<WindowState>((set, get) => ({
         isMaximized: false,
         isMinimized: false,
         position: { x: window.innerWidth / 2, y: 0 },
-        size: { width: window.innerWidth / 2, height: window.innerHeight - 80 },
+        size: { width: window.innerWidth / 2, height: window.innerHeight },
         layout: LAYOUTS.SNAP_RIGHT,
         zIndex:
           Math.max(...Object.values(windowData).map((w) => w.zIndex), 0) + 1,
@@ -735,7 +735,7 @@ export const useWindowStore = create<WindowState>((set, get) => ({
         position: { x: 0, y: 0 },
         size: {
           width: window.innerWidth,
-          height: (window.innerHeight - 80) / 2,
+          height: window.innerHeight / 2,
         },
         layout: LAYOUTS.SNAP_TOP,
         zIndex:
@@ -762,10 +762,10 @@ export const useWindowStore = create<WindowState>((set, get) => ({
         ...windowData[appId],
         isMaximized: false,
         isMinimized: false,
-        position: { x: 0, y: (window.innerHeight - 80) / 2 },
+        position: { x: 0, y: window.innerHeight / 2 },
         size: {
           width: window.innerWidth,
-          height: (window.innerHeight - 80) / 2,
+          height: window.innerHeight / 2,
         },
         layout: LAYOUTS.SNAP_BOTTOM,
         zIndex:
@@ -796,7 +796,7 @@ export const useWindowStore = create<WindowState>((set, get) => ({
         position: { x: 0, y: 0 },
         size: {
           width: window.innerWidth / 2,
-          height: (window.innerHeight - 80) / 2,
+          height: window.innerHeight / 2,
         },
         layout: LAYOUTS.SNAP_TOP_LEFT,
         zIndex:
@@ -826,7 +826,7 @@ export const useWindowStore = create<WindowState>((set, get) => ({
         position: { x: window.innerWidth / 2, y: 0 },
         size: {
           width: window.innerWidth / 2,
-          height: (window.innerHeight - 80) / 2,
+          height: window.innerHeight / 2,
         },
         layout: LAYOUTS.SNAP_TOP_RIGHT,
         zIndex:
@@ -853,10 +853,10 @@ export const useWindowStore = create<WindowState>((set, get) => ({
         ...windowData[appId],
         isMaximized: false,
         isMinimized: false,
-        position: { x: 0, y: (window.innerHeight - 80) / 2 },
+        position: { x: 0, y: window.innerHeight / 2 },
         size: {
           width: window.innerWidth / 2,
-          height: (window.innerHeight - 80) / 2,
+          height: window.innerHeight / 2,
         },
         layout: LAYOUTS.SNAP_BOTTOM_LEFT,
         zIndex:
@@ -885,11 +885,11 @@ export const useWindowStore = create<WindowState>((set, get) => ({
         isMinimized: false,
         position: {
           x: window.innerWidth / 2,
-          y: (window.innerHeight - 80) / 2,
+          y: window.innerHeight / 2,
         },
         size: {
           width: window.innerWidth / 2,
-          height: (window.innerHeight - 80) / 2,
+          height: window.innerHeight / 2,
         },
         layout: LAYOUTS.SNAP_BOTTOM_RIGHT,
         zIndex:

@@ -178,7 +178,7 @@ const Desktop: React.FC<DesktopProps> = ({ iconStyles = [] }) => {
         />
       ))}
 
-      <div className="absolute bottom-[9px]">
+      <div className="absolute bottom-[9px] z-[1000]">
         <FloatingDock items={links} />
       </div>
     </div>

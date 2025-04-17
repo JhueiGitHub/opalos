@@ -165,7 +165,7 @@ export const AppWindow: React.FC<AppWindowProps> = ({ appId, title }) => {
         top: 0,
         left: 0,
         width: "100%",
-        height: "calc(100% - 80px)", // Account for dock
+        height: "100%", // Account for dock
         transform: "none",
       };
     }
