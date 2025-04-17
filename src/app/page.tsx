@@ -10,6 +10,7 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import Desktop from "./components/Desktop";
+import Image from "next/image";
 
 export default async function Home() {
   // Check authentication
@@ -39,7 +40,15 @@ export default async function Home() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="w-screen h-screen" style={wallpaperStyle}>
+      <div className="w-screen h-screen">
+        <Image
+          src="/media/bg.png"
+          alt="bg"
+          width={1080}
+          height={540}
+          className="h-full w-full object-cover"
+        />
+        {/* <div className="w-screen h-screen" style={wallpaperStyle}> */}
         <Desktop iconStyles={dockIconStyles} />
       </div>
     </HydrationBoundary>

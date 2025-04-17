@@ -42,7 +42,7 @@ export const AppWindow: React.FC<AppWindowProps> = ({ appId, title }) => {
     moveWindow,
     resizeWindow,
     currentWorkspace,
-    // New snap actions
+    // Snap actions
     snapWindowLeft,
     snapWindowRight,
     snapWindowTop,
@@ -58,7 +58,6 @@ export const AppWindow: React.FC<AppWindowProps> = ({ appId, title }) => {
   const dragRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [showSnapControls, setShowSnapControls] = useState(false);
 
   // Get window data
   const window = windowData[appId];
@@ -69,7 +68,7 @@ export const AppWindow: React.FC<AppWindowProps> = ({ appId, title }) => {
   const isVisible =
     !window.isMinimized && window.workspace === currentWorkspace;
 
-  // Function to start dragging (unchanged)
+  // Function to start dragging
   const startDrag = (e: React.MouseEvent) => {
     if (window.isMaximized) return;
 
@@ -99,7 +98,7 @@ export const AppWindow: React.FC<AppWindowProps> = ({ appId, title }) => {
     document.addEventListener("mouseup", stopDrag);
   };
 
-  // Function to start resizing (unchanged)
+  // Function to start resizing
   const startResize = (e: React.MouseEvent) => {
     if (window.isMaximized) return;
 
@@ -165,7 +164,7 @@ export const AppWindow: React.FC<AppWindowProps> = ({ appId, title }) => {
         top: 0,
         left: 0,
         width: "100%",
-        height: "100%", // Account for dock
+        height: "100%", // Allow windows to extend behind the dock
         transform: "none",
       };
     }
@@ -180,13 +179,13 @@ export const AppWindow: React.FC<AppWindowProps> = ({ appId, title }) => {
     };
   };
 
-  // Get classes for highlight buttons based on current layout
+  // Get classes for snap buttons based on current layout
   const getSnapButtonClass = (layout: string) => {
     return cn(
-      "w-6 h-6 flex items-center justify-center rounded-full transition-colors",
+      "w-6 h-6 flex items-center justify-center transition-colors",
       window.layout === layout
-        ? "bg-white bg-opacity-40 text-white"
-        : "text-white text-opacity-60 hover:text-opacity-100 hover:bg-white hover:bg-opacity-10"
+        ? "text-white opacity-100"
+        : "text-white opacity-50 hover:opacity-80"
     );
   };
 
@@ -204,17 +203,16 @@ export const AppWindow: React.FC<AppWindowProps> = ({ appId, title }) => {
         variants={layoutVariants}
         onClick={() => setActiveApp(appId)}
         whileHover={{ boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)" }}
-        onMouseEnter={() => setShowSnapControls(true)}
-        onMouseLeave={() => setShowSnapControls(false)}
         layoutId={`window-${appId}`}
       >
         {/* Window title bar */}
         <div
           ref={dragRef}
-          className={`flex items-center justify-between px-4 py-2 bg-black cursor-move
+          className={`flex items-center justify-between px-4 py-2 bg-black cursor-move h-10
                      ${isActive ? "bg-opacity-60" : "bg-opacity-40"}`}
           onMouseDown={startDrag}
         >
+          {/* Left side: Window control buttons */}
           <div className="flex space-x-2">
             <button
               className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 transition-colors"
@@ -238,67 +236,113 @@ export const AppWindow: React.FC<AppWindowProps> = ({ appId, title }) => {
               }}
             />
           </div>
-          <div
-            className={`text-white text-sm font-medium ${
-              isActive ? "opacity-100" : "opacity-70"
-            }`}
-          >
-            {title}
-          </div>
 
-          {/* Snap controls - fade in when window is hovered */}
-          <AnimatePresence>
-            {showSnapControls && (
-              <motion.div
-                className="flex space-x-1"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.2 }}
+          {/* Right side: All snap controls */}
+          <div className="flex items-center space-x-2">
+            {/* Half-window snap controls */}
+            <div className="flex space-x-1 mr-2">
+              <button
+                className={getSnapButtonClass(LAYOUTS.SNAP_LEFT)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  snapWindowLeft(appId);
+                }}
+                title="Snap to left half"
               >
-                <button
-                  className={getSnapButtonClass(LAYOUTS.SNAP_LEFT)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    snapWindowLeft(appId);
-                  }}
-                  title="Snap to left half"
-                >
-                  <IconChevronLeft size={14} />
-                </button>
-                <button
-                  className={getSnapButtonClass(LAYOUTS.SNAP_RIGHT)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    snapWindowRight(appId);
-                  }}
-                  title="Snap to right half"
-                >
-                  <IconChevronRight size={14} />
-                </button>
-                <button
-                  className={getSnapButtonClass(LAYOUTS.SNAP_TOP)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    snapWindowTop(appId);
-                  }}
-                  title="Snap to top half"
-                >
-                  <IconChevronUp size={14} />
-                </button>
-                <button
-                  className={getSnapButtonClass(LAYOUTS.SNAP_BOTTOM)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    snapWindowBottom(appId);
-                  }}
-                  title="Snap to bottom half"
-                >
-                  <IconChevronDown size={14} />
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <IconChevronLeft size={14} />
+              </button>
+              <button
+                className={getSnapButtonClass(LAYOUTS.SNAP_RIGHT)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  snapWindowRight(appId);
+                }}
+                title="Snap to right half"
+              >
+                <IconChevronRight size={14} />
+              </button>
+              <button
+                className={getSnapButtonClass(LAYOUTS.SNAP_TOP)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  snapWindowTop(appId);
+                }}
+                title="Snap to top half"
+              >
+                <IconChevronUp size={14} />
+              </button>
+              <button
+                className={getSnapButtonClass(LAYOUTS.SNAP_BOTTOM)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  snapWindowBottom(appId);
+                }}
+                title="Snap to bottom half"
+              >
+                <IconChevronDown size={14} />
+              </button>
+            </div>
+
+            {/* Quarter-window snap controls */}
+            <div className="flex space-x-1">
+              <button
+                className={getSnapButtonClass(LAYOUTS.SNAP_TOP_LEFT)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  snapWindowTopLeft(appId);
+                }}
+                title="Snap to top-left quarter"
+              >
+                <IconCornerUpLeft size={14} />
+              </button>
+              <button
+                className={getSnapButtonClass(LAYOUTS.SNAP_TOP_RIGHT)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  snapWindowTopRight(appId);
+                }}
+                title="Snap to top-right quarter"
+              >
+                <IconCornerUpRight size={14} />
+              </button>
+              <button
+                className={getSnapButtonClass(LAYOUTS.SNAP_BOTTOM_LEFT)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  snapWindowBottomLeft(appId);
+                }}
+                title="Snap to bottom-left quarter"
+              >
+                <IconCornerDownLeft size={14} />
+              </button>
+              <button
+                className={getSnapButtonClass(LAYOUTS.SNAP_BOTTOM_RIGHT)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  snapWindowBottomRight(appId);
+                }}
+                title="Snap to bottom-right quarter"
+              >
+                <IconCornerDownRight size={14} />
+              </button>
+            </div>
+
+            {/* Maximize/Restore button */}
+            <button
+              className="w-6 h-6 flex items-center justify-center ml-2 text-white opacity-70 hover:opacity-100"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.isMaximized ? restoreApp(appId) : maximizeApp(appId);
+              }}
+              title={window.isMaximized ? "Restore window" : "Maximize window"}
+            >
+              {window.isMaximized ? (
+                <IconMinimize size={16} />
+              ) : (
+                <IconMaximize size={16} />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* App content */}
@@ -322,97 +366,6 @@ export const AppWindow: React.FC<AppWindowProps> = ({ appId, title }) => {
             </svg>
           </div>
         )}
-
-        {/* Enhanced snap controls that appear in corners when window is hovered */}
-        <AnimatePresence>
-          {showSnapControls && !window.isMaximized && (
-            <>
-              {/* Corner buttons */}
-              <motion.button
-                className="absolute top-12 left-2 w-8 h-8 rounded-full bg-black bg-opacity-30 
-                           flex items-center justify-center text-white opacity-70 hover:opacity-100"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 0.7, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  snapWindowTopLeft(appId);
-                }}
-                title="Snap to top-left corner"
-              >
-                <IconCornerUpLeft size={16} />
-              </motion.button>
-
-              <motion.button
-                className="absolute top-12 right-2 w-8 h-8 rounded-full bg-black bg-opacity-30 
-                           flex items-center justify-center text-white opacity-70 hover:opacity-100"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 0.7, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  snapWindowTopRight(appId);
-                }}
-                title="Snap to top-right corner"
-              >
-                <IconCornerUpRight size={16} />
-              </motion.button>
-
-              <motion.button
-                className="absolute bottom-12 left-2 w-8 h-8 rounded-full bg-black bg-opacity-30 
-                           flex items-center justify-center text-white opacity-70 hover:opacity-100"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 0.7, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  snapWindowBottomLeft(appId);
-                }}
-                title="Snap to bottom-left corner"
-              >
-                <IconCornerDownLeft size={16} />
-              </motion.button>
-
-              <motion.button
-                className="absolute bottom-12 right-2 w-8 h-8 rounded-full bg-black bg-opacity-30 
-                           flex items-center justify-center text-white opacity-70 hover:opacity-100"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 0.7, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  snapWindowBottomRight(appId);
-                }}
-                title="Snap to bottom-right corner"
-              >
-                <IconCornerDownRight size={16} />
-              </motion.button>
-
-              {/* Center button for maximize/restore */}
-              <motion.button
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                           w-10 h-10 rounded-full bg-black bg-opacity-50 
-                           flex items-center justify-center text-white opacity-70 hover:opacity-100"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 0.8, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.isMaximized ? restoreApp(appId) : maximizeApp(appId);
-                }}
-                title={
-                  window.isMaximized ? "Restore window" : "Maximize window"
-                }
-              >
-                {window.isMaximized ? (
-                  <IconMinimize size={20} />
-                ) : (
-                  <IconMaximize size={20} />
-                )}
-              </motion.button>
-            </>
-          )}
-        </AnimatePresence>
       </motion.div>
     </AnimatePresence>
   );
